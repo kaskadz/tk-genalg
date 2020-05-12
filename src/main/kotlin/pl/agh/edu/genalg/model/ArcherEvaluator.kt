@@ -1,7 +1,6 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.EvaluatedPopulation
-import pl.agh.edu.genalg.framework.SingleEntityEvaluator
+import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sin

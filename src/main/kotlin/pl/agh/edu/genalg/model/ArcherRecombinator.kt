@@ -1,7 +1,7 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.CouplePopulationRecombinator
-import pl.agh.edu.genalg.framework.EvaluatedPopulation
+import pl.agh.edu.genalg.framework.flow.CouplePopulationRecombinator
+import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
 import kotlin.random.Random
 
 class ArcherRecombinator(hyperparameters: ArcherHyperparameters) :

@@ -1,13 +1,13 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.EvaluatedPopulation
-import pl.agh.edu.genalg.framework.PopulationMutator
+import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
+import pl.agh.edu.genalg.framework.flow.PopulationMutator
 import kotlin.random.Random
 
 class ArcherMutator(hyperparameters: ArcherHyperparameters) :
     PopulationMutator<Archer, EvaluatedArcher, ArcherHyperparameters>(hyperparameters) {
 
-    override fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<Archer, EvaluatedArcher>): EvaluatedPopulation<Archer, EvaluatedArcher> {
+    override fun selectPopulationToBeMutated(evaluatedPopulation: EvaluatedPopulation<Archer, EvaluatedArcher>): EvaluatedPopulation<Archer, EvaluatedArcher> {
         return evaluatedPopulation
     }
 

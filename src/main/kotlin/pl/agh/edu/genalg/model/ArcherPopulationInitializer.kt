@@ -1,7 +1,7 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.Population
-import pl.agh.edu.genalg.framework.PopulationInitializer
+import pl.agh.edu.genalg.framework.model.Population
+import pl.agh.edu.genalg.framework.flow.PopulationInitializer
 
 class ArcherPopulationInitializer(hyperparameters: ArcherHyperparameters) :
     PopulationInitializer<Archer, ArcherHyperparameters>(hyperparameters) {

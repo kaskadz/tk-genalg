@@ -1,6 +1,6 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.Hyperparameters
+import pl.agh.edu.genalg.framework.model.Hyperparameters
 
 class ArcherHyperparameters(
     maxIterationsCount: Int,

@@ -1,4 +1,6 @@
-package pl.agh.edu.genalg.framework
+package pl.agh.edu.genalg.framework.flow
+
+import pl.agh.edu.genalg.framework.model.*
 
 abstract class SinglePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(hyperparameters: H) :
     PopulationRecombinator<E, F, H>(hyperparameters) {

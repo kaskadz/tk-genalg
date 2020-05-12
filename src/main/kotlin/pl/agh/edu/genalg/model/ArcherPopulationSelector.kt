@@ -1,7 +1,7 @@
 package pl.agh.edu.genalg.model
 
-import pl.agh.edu.genalg.framework.EvaluatedPopulation
-import pl.agh.edu.genalg.framework.PopulationSelector
+import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
+import pl.agh.edu.genalg.framework.flow.PopulationSelector
 import kotlin.math.abs
 
 class ArcherPopulationSelector(hyperparameters: ArcherHyperparameters) :
