@@ -5,7 +5,7 @@ import pl.agh.edu.genalg.framework.model.*
 abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(hyperparameters: H) :
     PopulationRecombinator<E, F, H>(hyperparameters) {
 
-    override fun recombinePopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
+    override fun recombineSelectedPopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
         val newEntities = evaluatedPopulation.evaluatedEntities
             .map { it.entity }
             .shuffled()
@@ -17,5 +17,5 @@ abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, 
         return Population(newEntities)
     }
 
-    abstract fun recombineCouple(entity1: E, entity2: E): E
+    protected abstract fun recombineCouple(entity1: E, entity2: E): E
 }

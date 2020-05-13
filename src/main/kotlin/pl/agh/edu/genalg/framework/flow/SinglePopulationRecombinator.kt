@@ -5,7 +5,7 @@ import pl.agh.edu.genalg.framework.model.*
 abstract class SinglePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(hyperparameters: H) :
     PopulationRecombinator<E, F, H>(hyperparameters) {
 
-    override fun recombinePopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
+    override fun recombineSelectedPopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
         val newEntities = evaluatedPopulation.evaluatedEntities
             .map { it.entity }
             .map { recombineSingle(it) }
@@ -13,5 +13,5 @@ abstract class SinglePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, 
         return Population(newEntities)
     }
 
-    abstract fun recombineSingle(entity: E): E
+    protected abstract fun recombineSingle(entity: E): E
 }

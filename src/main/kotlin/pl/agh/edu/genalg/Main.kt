@@ -24,24 +24,4 @@ fun main() {
     val mutator = ArcherMutator(hyperparameters)
 
     println("hello")
-//    val population = populationInitializer.initializePopulation()
-//    var iterationCount = 0
-//    val evaluatedEntities = evaluator.evaluatePopulation(population)
-//    var evaluatedPopulation = evaluator.sortPopulation(evaluatedEntities)
-//    while (!stopCondition.shouldStop(iterationCount++, evaluatedPopulation)) {
-//        val selected = selector.selectPopulation(evaluatedPopulation)
-//        val entitiesToRecombine = recombinator.selectPopulationToBeRecombined(selected)
-//        val newEntities = recombinator.recombinePopulation(entitiesToRecombine)
-//        val oldMutatedPopulation = selected.evaluatedEntities.map { mutator.mutateEntity(it.entity) }
-//        val newPopulation = newEntities.entities + oldMutatedPopulation
-//        val evaluatedEntities = evaluator.evaluatePopulation(
-//            Population(
-//                newPopulation
-//            )
-//        )
-//        evaluatedPopulation = evaluator.sortPopulation(evaluatedEntities)
-//    }
-
-    println("fin")
-    println(evaluatedPopulation.evaluatedEntities.first())
 }

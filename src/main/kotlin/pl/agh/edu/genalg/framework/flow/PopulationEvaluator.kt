@@ -12,5 +12,5 @@ abstract class PopulationEvaluator<E : Entity, F : EvaluatedEntity<E>, H : Hyper
         return EvaluatedPopulation(evaluatedEntities)
     }
 
-    abstract fun evaluateEntity(entity: E): F
+    protected abstract fun evaluateEntity(entity: E): F
 }
