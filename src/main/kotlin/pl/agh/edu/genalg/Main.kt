@@ -3,28 +3,28 @@ package pl.agh.edu.genalg
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import pl.agh.edu.genalg.framework.SupervisorActor
-import pl.agh.edu.genalg.framework.flow.MaxIterationsStopCondition
 import pl.agh.edu.genalg.onemax.*
 
 @ExperimentalCoroutinesApi
 fun main() {
     val hyperparameters = OneMaxHyperparameters(
-        maxIterationsCount = 105,
+        maxIterationsCount = 1000,
         initialPopulationSize = 100,
         vectorSize = 100,
-        deathRate = 0.3,
-        reproductionRate = 0.3,
+        deathRate = 0.4,
+        reproductionRate = 0.4,
         migrationRate = 0.1,
         mutationMaxScope = 0.15,
         mutationRate = 0.5,
-        iterationsCountBetweenMigrations = 20
+        iterationsCountBetweenMigrations = 20,
+        minimalPopulationSize = 2
     )
 
     val supervisorActor = SupervisorActor(
         hyperparameters,
         { h -> OneMaxPopulationInitializer(h) },
         { h -> OneMaxPopulationEvaluator(h) },
-        { h -> MaxIterationsStopCondition(h) },
+        { h -> OneMaxStopCondition(h) },
         { h -> OneMaxPopulationSelector(h) },
         { h -> OneMaxPopulationRecombinator(h) },
         { h -> OneMaxPopulationMutator(h) },
@@ -34,9 +34,10 @@ fun main() {
     println("start")
 
     runBlocking {
-        supervisorActor.runSimulation(5) { results ->
+        supervisorActor.runSimulation(10) { results ->
             results
                 .sortedByDescending { it.numberOfOnes }
+                .take(10)
                 .forEach { println(it) }
         }
     }

@@ -22,5 +22,6 @@ class OneMaxHyperparameters(
     val mutationRate: Double,
     val mutationMaxScope: Double,
     val migrationRate: Double,
-    val iterationsCountBetweenMigrations: Int
+    val iterationsCountBetweenMigrations: Int,
+    val minimalPopulationSize: Int
 ) : Hyperparameters(maxIterationsCount, initialPopulationSize)

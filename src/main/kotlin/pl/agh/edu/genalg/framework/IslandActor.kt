@@ -41,15 +41,15 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
         var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
         while (isActive && !stopCondition.shouldStop(++iterationCount, evaluatedPopulation)) {
             val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
-            println("Actor($id) iteration $iterationCount selected = ${selectedPopulation.evaluatedEntities.size}")
+//            println("Actor($id) iteration $iterationCount selected = ${selectedPopulation.evaluatedEntities.size}")
             val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
-            println("Actor($id) iteration $iterationCount recombined = ${postRecombinationPopulation.entities.size}")
+//            println("Actor($id) iteration $iterationCount recombined = ${postRecombinationPopulation.entities.size}")
             val postMutationPopulation = populationMutator.mutatePopulation(postRecombinationPopulation)
-            println("Actor($id) iteration $iterationCount mutated = ${postMutationPopulation.entities.size}")
+//            println("Actor($id) iteration $iterationCount mutated = ${postMutationPopulation.entities.size}")
             val postMigrationPopulation = populationMigrator.applyMigration(id, iterationCount, postMutationPopulation)
-            println("Actor($id) iteration $iterationCount migrated = ${postMigrationPopulation.entities.size}")
+//            println("Actor($id) iteration $iterationCount migrated = ${postMigrationPopulation.entities.size}")
             evaluatedPopulation = populationEvaluator.evaluatePopulation(postMigrationPopulation)
-            println("Actor($id) iteration $iterationCount evaluated = ${evaluatedPopulation.evaluatedEntities.size}")
+//            println("Actor($id) iteration $iterationCount evaluated = ${evaluatedPopulation.evaluatedEntities.size}")
         }
         println("Actor($id) finished in $iterationCount iteration; populationSize = ${evaluatedPopulation.evaluatedEntities.size}")
 
