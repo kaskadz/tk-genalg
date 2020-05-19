@@ -17,7 +17,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationSelectorFactory: (H) -> PopulationSelector<E, F, H>,
     private val populationRecombinatorFactory: (H) -> PopulationRecombinator<E, F, H>,
     private val populationMutatorFactory: (H) -> PopulationMutator<E, F, H>,
-    private val populationMigratorFactory: (H, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, H>
+    private val populationMigratorFactory: (H, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
 ) {
 
     @ExperimentalCoroutinesApi

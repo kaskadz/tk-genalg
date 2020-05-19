@@ -5,9 +5,8 @@ import pl.agh.edu.genalg.framework.model.*
 abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(hyperparameters: H) :
     PopulationRecombinator<E, F, H>(hyperparameters) {
 
-    override fun recombineSelectedPopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
-        val newEntities = evaluatedPopulation.evaluatedEntities
-            .map { it.entity }
+    override fun recombineSelectedPopulation(population: Population<E>): Population<E> {
+        val newEntities = population.entities
             .shuffled()
             .withIndex()
             .partition { it.index % 2 == 0 }

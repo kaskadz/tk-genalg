@@ -6,10 +6,10 @@ import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.MigrationMessage
 import pl.agh.edu.genalg.framework.model.*
 
-abstract class PopulationMigrator<E : Entity, H : Hyperparameters>(
+abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
-    val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
-    val emigrantsChannel: SendChannel<MigrationMessage<E>>
+    private val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
+    private val emigrantsChannel: SendChannel<MigrationMessage<E>>
 ) {
     protected abstract fun shouldMigrate(iterationCount: Int): Boolean
     protected abstract fun selectEmigrants(population: Population<E>): Pair<Collection<E>, Collection<E>>
@@ -21,13 +21,15 @@ abstract class PopulationMigrator<E : Entity, H : Hyperparameters>(
         evaluatedPopulation: Population<E>
     ): Population<E> {
         val postMigrationPopulation = mutableListOf<E>()
-        if (shouldMigrate(iterationCount)) {
+        if (evaluatedPopulation.entities.any() && shouldMigrate(iterationCount)) {
             val (emigrants, nonMigrants) = selectEmigrants(evaluatedPopulation)
             postMigrationPopulation.addAll(nonMigrants)
             emigrantsChannel.send(MigrationMessage(actorId, emigrants))
+        } else {
+            postMigrationPopulation.addAll(evaluatedPopulation.entities)
         }
 
-        if (!immigrantsChannel.isEmpty) {
+        while (!immigrantsChannel.isEmpty) {
             val immigrants = immigrantsChannel.receive()
             postMigrationPopulation.addAll(immigrants.migrants)
         }
