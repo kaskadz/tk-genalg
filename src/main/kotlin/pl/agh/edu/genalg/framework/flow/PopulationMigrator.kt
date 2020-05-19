@@ -8,14 +8,15 @@ import pl.agh.edu.genalg.framework.model.*
 
 abstract class PopulationMigrator<E : Entity, H : Hyperparameters>(
     val hyperparameters: H,
-    private val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
-    private val emigrantsChannel: SendChannel<MigrationMessage<E>>
+    val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
+    val emigrantsChannel: SendChannel<MigrationMessage<E>>
 ) {
     protected abstract fun shouldMigrate(iterationCount: Int): Boolean
     protected abstract fun selectEmigrants(population: Population<E>): Pair<Collection<E>, Collection<E>>
 
     @ExperimentalCoroutinesApi
     suspend fun applyMigration(
+        actorId: Int,
         iterationCount: Int,
         evaluatedPopulation: Population<E>
     ): Population<E> {
@@ -23,7 +24,7 @@ abstract class PopulationMigrator<E : Entity, H : Hyperparameters>(
         if (shouldMigrate(iterationCount)) {
             val (emigrants, nonMigrants) = selectEmigrants(evaluatedPopulation)
             postMigrationPopulation.addAll(nonMigrants)
-            emigrantsChannel.send(MigrationMessage(emigrants))
+            emigrantsChannel.send(MigrationMessage(actorId, emigrants))
         }
 
         if (!immigrantsChannel.isEmpty) {
