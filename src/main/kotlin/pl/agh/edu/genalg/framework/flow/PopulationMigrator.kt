@@ -24,7 +24,9 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
         if (evaluatedPopulation.entities.any() && shouldMigrate(iterationCount)) {
             val (emigrants, nonMigrants) = selectEmigrants(evaluatedPopulation)
             postMigrationPopulation.addAll(nonMigrants)
-            emigrantsChannel.send(MigrationMessage(actorId, emigrants))
+            if (emigrants.any()) {
+                emigrantsChannel.send(MigrationMessage(actorId, emigrants))
+            }
         } else {
             postMigrationPopulation.addAll(evaluatedPopulation.entities)
         }
