@@ -8,13 +8,13 @@ import pl.agh.edu.genalg.onemax.*
 @ExperimentalCoroutinesApi
 fun main() {
     val hyperparameters = OneMaxHyperparameters(
-        maxIterationsCount = 1000,
+        maxIterationsCount = 100000,
         initialPopulationSize = 100,
         vectorSize = 100,
         deathRate = 0.4,
         reproductionRate = 0.4,
         migrationRate = 0.1,
-        mutationMaxScope = 0.15,
+        mutationMaxScope = 0.05,
         mutationRate = 0.5,
         iterationsCountBetweenMigrations = 20,
         minimalPopulationSize = 2
