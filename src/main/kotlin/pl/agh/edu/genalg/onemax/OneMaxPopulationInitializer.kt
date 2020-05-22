@@ -12,12 +12,16 @@ class OneMaxPopulationInitializer(hyperparameters: OneMaxHyperparameters) :
         val entities = (1..hyperparameters.initialPopulationSize)
             .map {
                 val randomVector = (1..hyperparameters.vectorSize)
-                    .map { random.nextInt() % 2 }
+                    .map { getRandomGene() }
                     .toIntArray()
 
                 BinaryVector(randomVector)
             }
 
         return Population(entities)
+    }
+
+    private fun getRandomGene(): Int {
+        return if (random.nextDouble() < 0.5) 1 else 0
     }
 }
