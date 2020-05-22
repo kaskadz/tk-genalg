@@ -52,6 +52,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         .find { it.id == (emigrants.senderId + 1) % islandsCount }
 
                     if (islandActorReceiver != null) {
+                        println("Sending ${emigrants.migrants.size} to actor ${islandActorReceiver.id}")
                         islandActorReceiver.immigrantsInputChannel.send(emigrants)
                     } else {
                         throw GenalgSimulationException("Tried to send migrants to non existing actor")
