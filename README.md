@@ -8,3 +8,4 @@ _Generic, island based genetic simulation framework._
 - [ ] Refactor handling the results
 - [ ] Ensure migrations are actually working
 - [ ] Add noise to simulation model implementation
+- [x] Update gene generation to use random double instead of int
