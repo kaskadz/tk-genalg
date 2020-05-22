@@ -59,7 +59,9 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             try {
                 emigrantsChannel.send(MigrationMessage(id, immigrants.migrants))
             } catch (e: ClosedSendChannelException) {
-                println("Actor($id) discarding ${immigrants.migrants.size} migrants. Emigrants channel closed.")
+                if (immigrants.migrants.any()) {
+                    println("Actor($id) discarding ${immigrants.migrants.size} migrants. Emigrants channel closed.")
+                }
             }
         }
     }
