@@ -31,9 +31,13 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
             postMigrationPopulation.addAll(evaluatedPopulation.entities)
         }
 
-        while (!immigrantsChannel.isEmpty) {
-            val immigrants = immigrantsChannel.receive()
+        fun pollImmigrants() = immigrantsChannel.poll()
+
+        var immigrants = pollImmigrants()
+        while (immigrants != null) {
+            println("Receiving ${immigrants.migrants.size} immigrants from ${immigrants.senderId}")
             postMigrationPopulation.addAll(immigrants.migrants)
+            immigrants = pollImmigrants()
         }
 
         return Population(postMigrationPopulation)
