@@ -4,19 +4,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import pl.agh.edu.genalg.framework.SupervisorActor
 import pl.agh.edu.genalg.onemax.*
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @ExperimentalCoroutinesApi
 fun main() {
     val hyperparameters = OneMaxHyperparameters(
-        maxIterationsCount = 100000,
-        initialPopulationSize = 100,
+        maxIterationsCount = 1000,
+        initialPopulationSize = 1000,
         vectorSize = 100,
-        deathRate = 0.4,
-        reproductionRate = 0.4,
+        deathRate = 0.3,
+        reproductionRate = 0.3/0.7,
         migrationRate = 0.1,
         mutationMaxScope = 0.05,
         mutationRate = 0.5,
-        iterationsCountBetweenMigrations = 20,
+        iterationsCountBetweenMigrations = 10,
         minimalPopulationSize = 2
     )
 
@@ -34,7 +36,7 @@ fun main() {
     println("start")
 
     runBlocking {
-        supervisorActor.runSimulation(10) { results ->
+        supervisorActor.runSimulation(5) { results ->
             results
                 .sortedByDescending { it.numberOfOnes }
                 .take(10)
@@ -43,12 +45,4 @@ fun main() {
     }
 
     println("finished")
-
-    OneMaxPopulationInitializer(hyperparameters)
-        .initializePopulation()
-        .entities
-        .map { e -> e.genes.count { it == 1 } }
-        .sortedByDescending { it }
-        .take(10)
-        .forEach { println(it) }
 }

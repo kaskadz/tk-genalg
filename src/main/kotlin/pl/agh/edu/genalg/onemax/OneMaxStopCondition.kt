@@ -12,5 +12,6 @@ class OneMaxStopCondition(hyperparameters: OneMaxHyperparameters) :
     ): Boolean {
         return iterationCount >= hyperparameters.maxIterationsCount
                 || evaluatedPopulation.evaluatedEntities.size <= hyperparameters.minimalPopulationSize
+                || evaluatedPopulation.evaluatedEntities.any { it.numberOfOnes == hyperparameters.vectorSize }
     }
 }

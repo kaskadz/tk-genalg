@@ -8,6 +8,7 @@ import pl.agh.edu.genalg.framework.flow.*
 import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
 import pl.agh.edu.genalg.framework.model.Hyperparameters
+import kotlin.time.ExperimentalTime
 
 class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
@@ -20,9 +21,12 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationMigratorFactory: (H, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
 ) {
 
+    @ExperimentalTime
     @ExperimentalCoroutinesApi
     suspend fun runSimulation(islandsCount: Int, handleResults: (List<F>) -> Unit) {
         coroutineScope {
+            val metricsActor = MetricsActor(this)
+
             val resultChannel = Channel<ResultsMessage<E, F>>(Channel.UNLIMITED)
             val emigrantsChannel = Channel<MigrationMessage<E>>(Channel.UNLIMITED)
             val islandActors = (0 until islandsCount)
@@ -31,6 +35,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         id,
                         hyperparameters,
                         resultChannel,
+                        metricsActor.metricsChannel,
                         Channel(Channel.UNLIMITED),
                         emigrantsChannel,
                         this,
@@ -44,6 +49,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                     )
                 }.toList()
 
+            val metricsActorJob = metricsActor.start()
             val islandJobs = islandActors.map { it.start() }
 
             launch {
@@ -70,6 +76,10 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             islandActors.forEach { it.immigrantsInputChannel.close() }
             emigrantsChannel.close()
             islandJobs.forEach { it.join() }
+
+            metricsActorJob.cancel()
+            metricsActorJob.join()
+            metricsActor.saveReport()
 
             handleResults(resultList)
         }
