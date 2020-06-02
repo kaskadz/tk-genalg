@@ -40,14 +40,12 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
         var iterationCount = 0
 
         val population = populationInitializer.initializePopulation()
-        sendMetric(iterationCount, "initialPopulation", population.entities.size)
+        sendMetric(iterationCount, "populationSize", population.entities.size)
 
         var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
-        sendMetric(iterationCount, "postEvaluationPopulationSize", evaluatedPopulation.evaluatedEntities.size)
 
         while (isActive && !stopCondition.shouldStop(++iterationCount, evaluatedPopulation)) {
             val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
-            sendMetric(iterationCount, "postSelectionPopulationSize", selectedPopulation.evaluatedEntities.size)
             sendMetric(
                 iterationCount,
                 "entitiesDied",
@@ -55,7 +53,6 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             )
 
             val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
-            sendMetric(iterationCount, "postRecombinationPopulationSize", postRecombinationPopulation.entities.size)
             sendMetric(
                 iterationCount,
                 "entitiesBorn",
@@ -63,13 +60,16 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             )
 
             val postMutationPopulation = populationMutator.mutatePopulation(postRecombinationPopulation)
-            sendMetric(iterationCount, "postMutationPopulationSize", postMutationPopulation.entities.size)
 
             val postMigrationPopulation = populationMigrator.applyMigration(id, iterationCount, postMutationPopulation)
-            sendMetric(iterationCount, "postMigrationPopulationSize", postMigrationPopulation.entities.size)
+            sendMetric(
+                iterationCount,
+                "migrationDelta",
+                postMigrationPopulation.entities.size - postMutationPopulation.entities.size
+            )
 
             evaluatedPopulation = populationEvaluator.evaluatePopulation(postMigrationPopulation)
-            sendMetric(iterationCount, "postEvaluationPopulationSize", evaluatedPopulation.evaluatedEntities.size)
+            sendMetric(iterationCount, "populationSize", evaluatedPopulation.evaluatedEntities.size)
             delay((0..10).random().milliseconds)
         }
         println("Actor($id) finished in $iterationCount iteration; populationSize = ${evaluatedPopulation.evaluatedEntities.size}")
