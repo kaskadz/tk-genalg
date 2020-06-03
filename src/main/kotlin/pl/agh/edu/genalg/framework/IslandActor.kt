@@ -50,7 +50,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
         reporter.log("started")
 
         val population = populationInitializer.initializePopulation()
-        reporter.metric("populationSize", population.entities.size)
+        reporter.metric("populationSize", population.size)
 
         var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
 
@@ -58,13 +58,13 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
             reporter.metric(
                 "entitiesDied",
-                evaluatedPopulation.evaluatedEntities.size - selectedPopulation.evaluatedEntities.size
+                evaluatedPopulation.size - selectedPopulation.size
             )
 
             val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
             reporter.metric(
                 "entitiesBorn",
-                postRecombinationPopulation.entities.size - selectedPopulation.evaluatedEntities.size
+                postRecombinationPopulation.size - selectedPopulation.size
             )
 
             val postMutationPopulation = populationMutator.mutatePopulation(postRecombinationPopulation)
@@ -72,14 +72,14 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             val postMigrationPopulation = populationMigrator.applyMigration(id, iterationCount, postMutationPopulation)
             reporter.metric(
                 "migrationDelta",
-                postMigrationPopulation.entities.size - postMutationPopulation.entities.size
+                postMigrationPopulation.size - postMutationPopulation.size
             )
 
             evaluatedPopulation = populationEvaluator.evaluatePopulation(postMigrationPopulation)
-            reporter.metric("populationSize", evaluatedPopulation.evaluatedEntities.size)
+            reporter.metric("populationSize", evaluatedPopulation.size)
             delay((0..10).random().milliseconds)
         }
-        reporter.log("finished; populationSize = ${evaluatedPopulation.evaluatedEntities.size}")
+        reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
 
         resultChannel.send(ResultsMessage(evaluatedPopulation.evaluatedEntities))
 

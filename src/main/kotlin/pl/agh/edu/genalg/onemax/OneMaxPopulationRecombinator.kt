@@ -25,7 +25,7 @@ class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters, repor
 
     override fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>): Population<BinaryVector> {
         val numberOfEntitiesChosenToRecombine =
-            (evaluatedPopulation.evaluatedEntities.size * 2 * hyperparameters.reproductionRate).roundToInt()
+            (evaluatedPopulation.size * 2 * hyperparameters.reproductionRate).roundToInt()
 
         val entitiesChosenToRecombine = evaluatedPopulation.evaluatedEntities
             .sortedByDescending { it.numberOfOnes }

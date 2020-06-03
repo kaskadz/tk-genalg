@@ -12,7 +12,7 @@ class OneMaxStopCondition(hyperparameters: OneMaxHyperparameters, reporter: Repo
         evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>
     ): Boolean {
         return iterationCount >= hyperparameters.maxIterationsCount
-                || evaluatedPopulation.evaluatedEntities.size <= hyperparameters.minimalPopulationSize
+                || evaluatedPopulation.size <= hyperparameters.minimalPopulationSize
                 || evaluatedPopulation.evaluatedEntities.any { it.numberOfOnes == hyperparameters.vectorSize }
     }
 }

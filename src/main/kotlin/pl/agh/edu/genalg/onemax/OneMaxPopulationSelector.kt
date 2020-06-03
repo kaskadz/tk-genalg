@@ -9,11 +9,11 @@ class OneMaxPopulationSelector(hyperparameters: OneMaxHyperparameters, reporter:
     PopulationSelector<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters, reporter) {
 
     override fun selectPopulation(evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>): EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector> {
-        val numberOfEntitiesToDie = evaluatedPopulation.evaluatedEntities.size * hyperparameters.deathRate
+        val numberOfEntitiesToDie = evaluatedPopulation.size * hyperparameters.deathRate
 
         val survivedEntities = evaluatedPopulation.evaluatedEntities
             .sortedByDescending { it.numberOfOnes }
-            .take((evaluatedPopulation.evaluatedEntities.size - numberOfEntitiesToDie).roundToInt())
+            .take((evaluatedPopulation.size - numberOfEntitiesToDie).roundToInt())
 
         return EvaluatedPopulation(survivedEntities)
     }

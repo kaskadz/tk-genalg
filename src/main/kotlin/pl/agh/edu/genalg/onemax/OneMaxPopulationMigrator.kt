@@ -24,7 +24,7 @@ class OneMaxPopulationMigrator(
     }
 
     override fun selectEmigrants(population: Population<BinaryVector>): Pair<Collection<BinaryVector>, Collection<BinaryVector>> {
-        val numberOfEntitiesToMigrate = (population.entities.size * hyperparameters.migrationRate).roundToInt()
+        val numberOfEntitiesToMigrate = (population.size * hyperparameters.migrationRate).roundToInt()
 
         val sortedByScore = population.entities.shuffled()
 
