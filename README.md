@@ -9,3 +9,5 @@ _Generic, island based genetic simulation framework._
 - [ ] Make migrator receive evaluated population (in order for it to make decisions based on entity's fitness)
 - [ ] Add noise to simulation model implementation
 - [ ] Refactor handling the results
+- [ ] Add 'allstop' condition
+- [ ] Introduce an interface for each component
