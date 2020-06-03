@@ -10,12 +10,15 @@ import java.time.format.DateTimeFormatter
 class MetricsActor(
     private val coroutineScope: CoroutineScope
 ) {
-    val metricsChannel: Channel<Metric> = Channel(Channel.UNLIMITED)
+    val metricsChannel: Channel<MetricLike> = Channel(Channel.UNLIMITED)
     private val metrics = mutableListOf<Metric>()
 
     fun start() = coroutineScope.launch {
         for (metric in metricsChannel) {
-            metrics.add(metric)
+            when (metric) {
+                is Log -> println("[${metric.islandId}] #${metric.iteration} ${metric.message}")
+                is Metric -> metrics.add(metric)
+            }
         }
     }
 

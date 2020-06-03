@@ -1,11 +1,12 @@
 package pl.agh.edu.genalg.onemax
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.flow.PopulationMutator
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class OneMaxPopulationMutator(hyperparameters: OneMaxHyperparameters) :
-    PopulationMutator<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters) {
+class OneMaxPopulationMutator(hyperparameters: OneMaxHyperparameters, reporter: Reporter) :
+    PopulationMutator<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters, reporter) {
 
     private val random = Random.Default
 

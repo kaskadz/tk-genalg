@@ -1,13 +1,17 @@
 package pl.agh.edu.genalg.onemax
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.flow.CouplePopulationRecombinator
 import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
 import pl.agh.edu.genalg.framework.model.Population
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters) :
-    CouplePopulationRecombinator<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters) {
+class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters, reporter: Reporter) :
+    CouplePopulationRecombinator<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(
+        hyperparameters,
+        reporter
+    ) {
 
     private val random = Random.Default
 

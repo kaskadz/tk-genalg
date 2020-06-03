@@ -12,13 +12,13 @@ import kotlin.time.ExperimentalTime
 
 class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
-    private val populationInitializerFactory: (H) -> PopulationInitializer<E, H>,
-    private val populationEvaluatorFactory: (H) -> PopulationEvaluator<E, F, H>,
-    private val stopConditionFactory: (H) -> StopCondition<E, F, H>,
-    private val populationSelectorFactory: (H) -> PopulationSelector<E, F, H>,
-    private val populationRecombinatorFactory: (H) -> PopulationRecombinator<E, F, H>,
-    private val populationMutatorFactory: (H) -> PopulationMutator<E, F, H>,
-    private val populationMigratorFactory: (H, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
+    private val populationInitializerFactory: (H, Reporter) -> PopulationInitializer<E, H>,
+    private val populationEvaluatorFactory: (H, Reporter) -> PopulationEvaluator<E, F, H>,
+    private val stopConditionFactory: (H, Reporter) -> StopCondition<E, F, H>,
+    private val populationSelectorFactory: (H, Reporter) -> PopulationSelector<E, F, H>,
+    private val populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
+    private val populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
+    private val populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
 ) {
 
     @ExperimentalTime
@@ -35,17 +35,17 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         id,
                         hyperparameters,
                         resultChannel,
-                        metricsActor.metricsChannel,
                         Channel(Channel.UNLIMITED),
                         emigrantsChannel,
                         this,
-                        populationInitializerFactory(hyperparameters),
-                        populationEvaluatorFactory(hyperparameters),
-                        stopConditionFactory(hyperparameters),
-                        populationSelectorFactory(hyperparameters),
-                        populationRecombinatorFactory(hyperparameters),
-                        populationMutatorFactory(hyperparameters),
-                        populationMigratorFactory
+                        populationInitializerFactory,
+                        populationEvaluatorFactory,
+                        stopConditionFactory,
+                        populationSelectorFactory,
+                        populationRecombinatorFactory,
+                        populationMutatorFactory,
+                        populationMigratorFactory,
+                        { reportContext -> ContextReporter(reportContext, metricsActor.metricsChannel) }
                     )
                 }.toList()
 

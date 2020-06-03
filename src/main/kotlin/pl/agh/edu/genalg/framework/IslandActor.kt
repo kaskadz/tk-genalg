@@ -16,45 +16,51 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val id: Int,
     val hyperparameters: H,
     private val resultChannel: SendChannel<ResultsMessage<E, F>>,
-    private val metricsChannel: SendChannel<Metric>,
     private val immigrantsChannel: Channel<MigrationMessage<E>>,
     private val emigrantsChannel: Channel<MigrationMessage<E>>,
     private val coroutineScope: CoroutineScope,
-    private val populationInitializer: PopulationInitializer<E, H>,
-    private val populationEvaluator: PopulationEvaluator<E, F, H>,
-    private val stopCondition: StopCondition<E, F, H>,
-    private val populationSelector: PopulationSelector<E, F, H>,
-    private val populationRecombinator: PopulationRecombinator<E, F, H>,
-    private val populationMutator: PopulationMutator<E, F, H>,
-    populationMigratorFactory: (H, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
+    populationInitializerFactory: (H, Reporter) -> PopulationInitializer<E, H>,
+    populationEvaluatorFactory: (H, Reporter) -> PopulationEvaluator<E, F, H>,
+    stopConditionFactory: (H, Reporter) -> StopCondition<E, F, H>,
+    populationSelectorFactory: (H, Reporter) -> PopulationSelector<E, F, H>,
+    populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
+    populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
+    populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
+    reporterFactory: (ReportContext) -> Reporter
 ) {
     val immigrantsInputChannel: SendChannel<MigrationMessage<E>> = immigrantsChannel
 
+    private var iterationCount = 0
+
+    private val reporter = reporterFactory(ReportContext(id) { this.iterationCount })
+    private val populationInitializer = populationInitializerFactory(hyperparameters, reporter)
+    private val populationEvaluator = populationEvaluatorFactory(hyperparameters, reporter)
+    private val stopCondition = stopConditionFactory(hyperparameters, reporter)
+    private val populationSelector = populationSelectorFactory(hyperparameters, reporter)
+    private val populationRecombinator = populationRecombinatorFactory(hyperparameters, reporter)
+    private val populationMutator = populationMutatorFactory(hyperparameters, reporter)
     private val populationMigrator =
-        populationMigratorFactory(hyperparameters, immigrantsChannel, emigrantsChannel)
+        populationMigratorFactory(hyperparameters, reporter, immigrantsChannel, emigrantsChannel)
 
     @ExperimentalTime
     @ExperimentalCoroutinesApi
     fun start() = coroutineScope.launch(Dispatchers.Unconfined) {
-        println("Actor($id) started")
-        var iterationCount = 0
+        reporter.log("started")
 
         val population = populationInitializer.initializePopulation()
-        sendMetric(iterationCount, "populationSize", population.entities.size)
+        reporter.metric("populationSize", population.entities.size)
 
         var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
 
         while (isActive && !stopCondition.shouldStop(++iterationCount, evaluatedPopulation)) {
             val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
-            sendMetric(
-                iterationCount,
+            reporter.metric(
                 "entitiesDied",
                 evaluatedPopulation.evaluatedEntities.size - selectedPopulation.evaluatedEntities.size
             )
 
             val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
-            sendMetric(
-                iterationCount,
+            reporter.metric(
                 "entitiesBorn",
                 postRecombinationPopulation.entities.size - selectedPopulation.evaluatedEntities.size
             )
@@ -62,17 +68,16 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             val postMutationPopulation = populationMutator.mutatePopulation(postRecombinationPopulation)
 
             val postMigrationPopulation = populationMigrator.applyMigration(id, iterationCount, postMutationPopulation)
-            sendMetric(
-                iterationCount,
+            reporter.metric(
                 "migrationDelta",
                 postMigrationPopulation.entities.size - postMutationPopulation.entities.size
             )
 
             evaluatedPopulation = populationEvaluator.evaluatePopulation(postMigrationPopulation)
-            sendMetric(iterationCount, "populationSize", evaluatedPopulation.evaluatedEntities.size)
+            reporter.metric("populationSize", evaluatedPopulation.evaluatedEntities.size)
             delay((0..10).random().milliseconds)
         }
-        println("Actor($id) finished in $iterationCount iteration; populationSize = ${evaluatedPopulation.evaluatedEntities.size}")
+        reporter.log("finished; populationSize = ${evaluatedPopulation.evaluatedEntities.size}")
 
         resultChannel.send(ResultsMessage(evaluatedPopulation.evaluatedEntities))
 
@@ -81,13 +86,9 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                 emigrantsChannel.send(MigrationMessage(id, immigrants.migrants))
             } catch (e: ClosedSendChannelException) {
                 if (immigrants.migrants.any()) {
-                    println("Actor($id) discarding ${immigrants.migrants.size} migrants. Emigrants channel closed.")
+                    reporter.log("Discarding ${immigrants.migrants.size} migrants. Emigrants channel closed.")
                 }
             }
         }
-    }
-
-    private suspend fun sendMetric(iteration: Int, key: String, value: Any) {
-        metricsChannel.send(Metric(iteration, id, key, value))
     }
 }

@@ -4,10 +4,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.MigrationMessage
-import pl.agh.edu.genalg.framework.model.*
+import pl.agh.edu.genalg.framework.Reporter
+import pl.agh.edu.genalg.framework.model.Entity
+import pl.agh.edu.genalg.framework.model.EvaluatedEntity
+import pl.agh.edu.genalg.framework.model.Hyperparameters
+import pl.agh.edu.genalg.framework.model.Population
 
 abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
+    val reporter: Reporter,
     private val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
     private val emigrantsChannel: SendChannel<MigrationMessage<E>>
 ) {

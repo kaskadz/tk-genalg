@@ -1,9 +1,12 @@
 package pl.agh.edu.genalg.framework.flow
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.model.*
 
-abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(hyperparameters: H) :
-    PopulationRecombinator<E, F, H>(hyperparameters) {
+abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
+    hyperparameters: H,
+    reporter: Reporter
+) : PopulationRecombinator<E, F, H>(hyperparameters, reporter) {
 
     override fun recombineSelectedPopulation(population: Population<E>): Population<E> {
         val newEntities = population.entities

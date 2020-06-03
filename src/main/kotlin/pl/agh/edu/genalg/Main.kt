@@ -24,13 +24,13 @@ fun main() {
 
     val supervisorActor = SupervisorActor(
         hyperparameters,
-        { h -> OneMaxPopulationInitializer(h) },
-        { h -> OneMaxPopulationEvaluator(h) },
-        { h -> OneMaxStopCondition(h) },
-        { h -> OneMaxPopulationSelector(h) },
-        { h -> OneMaxPopulationRecombinator(h) },
-        { h -> OneMaxPopulationMutator(h) },
-        { h, c1, c2 -> OneMaxPopulationMigrator(h, c1, c2) }
+        { h, r -> OneMaxPopulationInitializer(h, r) },
+        { h, r -> OneMaxPopulationEvaluator(h, r) },
+        { h, r -> OneMaxStopCondition(h, r) },
+        { h, r -> OneMaxPopulationSelector(h, r) },
+        { h, r -> OneMaxPopulationRecombinator(h, r) },
+        { h, r -> OneMaxPopulationMutator(h, r) },
+        { h, r, c1, c2 -> OneMaxPopulationMigrator(h, r, c1, c2) }
     )
 
     println("start")

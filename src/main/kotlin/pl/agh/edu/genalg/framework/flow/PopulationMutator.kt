@@ -1,8 +1,12 @@
 package pl.agh.edu.genalg.framework.flow
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.model.*
 
-abstract class PopulationMutator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(val hyperparameters: H) {
+abstract class PopulationMutator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
+    val hyperparameters: H,
+    val reporter: Reporter
+) {
     protected abstract fun mutateEntity(entity: E): E
 
     fun mutatePopulation(

@@ -1,10 +1,11 @@
 package pl.agh.edu.genalg.onemax
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.flow.StopCondition
 import pl.agh.edu.genalg.framework.model.EvaluatedPopulation
 
-class OneMaxStopCondition(hyperparameters: OneMaxHyperparameters) :
-    StopCondition<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters) {
+class OneMaxStopCondition(hyperparameters: OneMaxHyperparameters, reporter: Reporter) :
+    StopCondition<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters, reporter) {
 
     override fun shouldStop(
         iterationCount: Int,

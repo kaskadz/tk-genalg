@@ -1,10 +1,11 @@
 package pl.agh.edu.genalg.onemax
 
+import pl.agh.edu.genalg.framework.Reporter
 import pl.agh.edu.genalg.framework.flow.PopulationInitializer
 import pl.agh.edu.genalg.framework.model.Population
 
-class OneMaxPopulationInitializer(hyperparameters: OneMaxHyperparameters) :
-    PopulationInitializer<BinaryVector, OneMaxHyperparameters>(hyperparameters) {
+class OneMaxPopulationInitializer(hyperparameters: OneMaxHyperparameters, reporter: Reporter) :
+    PopulationInitializer<BinaryVector, OneMaxHyperparameters>(hyperparameters, reporter) {
 
     private val random = kotlin.random.Random.Default
 
