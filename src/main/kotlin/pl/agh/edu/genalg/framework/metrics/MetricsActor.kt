@@ -16,7 +16,8 @@ class MetricsActor(
     fun start() = coroutineScope.launch {
         for (metric in metricsChannel) {
             when (metric) {
-                is Log -> println("[${metric.islandId}] #${metric.iteration} ${metric.message}")
+                is FacilityLog -> println("[${metric.origin}] ${metric.message}")
+                is IslandLog -> println("[${metric.islandId}] #${metric.iteration} ${metric.message}")
                 is Metric -> metrics.add(metric)
             }
         }

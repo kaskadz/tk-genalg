@@ -7,16 +7,16 @@ interface Reporter {
     suspend fun metric(key: String, value: Any)
 }
 
-class ReportContext(val islandId: Int, val iterationCountProvider: () -> Int)
+class IslandReportContext(val islandId: Int, val iterationCountProvider: () -> Int)
 
-class ContextReporter(
-    private val reportContext: ReportContext,
+class IslandContextReporter(
+    private val reportContext: IslandReportContext,
     private val metricsChannel: SendChannel<MetricLike>
 ) : Reporter {
 
     override suspend fun log(message: String) {
         metricsChannel.send(
-            Log(
+            IslandLog(
                 reportContext.iterationCountProvider(),
                 reportContext.islandId,
                 message
@@ -34,5 +34,20 @@ class ContextReporter(
             )
         )
     }
+}
 
+class FacilityContextReporter(private val origin: String, private val metricsChannel: SendChannel<MetricLike>) :
+    Reporter {
+
+    override suspend fun log(message: String) {
+        metricsChannel.send(
+            FacilityLog(origin, message)
+        )
+    }
+
+    override suspend fun metric(key: String, value: Any) {
+        metricsChannel.send(
+            Metric(-1, -1, key, value)
+        )
+    }
 }

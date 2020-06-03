@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.flow.*
-import pl.agh.edu.genalg.framework.metrics.ReportContext
+import pl.agh.edu.genalg.framework.metrics.IslandReportContext
 import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
@@ -28,13 +28,13 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
     populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
     populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
-    reporterFactory: (ReportContext) -> Reporter
+    reporterFactory: (IslandReportContext) -> Reporter
 ) {
     val immigrantsInputChannel: SendChannel<MigrationMessage<E>> = immigrantsChannel
 
     private var iterationCount = 0
 
-    private val reporter = reporterFactory(ReportContext(id) { this.iterationCount })
+    private val reporter = reporterFactory(IslandReportContext(id) { this.iterationCount })
     private val populationInitializer = populationInitializerFactory(hyperparameters, reporter)
     private val populationEvaluator = populationEvaluatorFactory(hyperparameters, reporter)
     private val stopCondition = stopConditionFactory(hyperparameters, reporter)

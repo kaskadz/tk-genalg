@@ -5,7 +5,8 @@ import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import pl.agh.edu.genalg.framework.flow.*
-import pl.agh.edu.genalg.framework.metrics.ContextReporter
+import pl.agh.edu.genalg.framework.metrics.FacilityContextReporter
+import pl.agh.edu.genalg.framework.metrics.IslandContextReporter
 import pl.agh.edu.genalg.framework.metrics.MetricsActor
 import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.Entity
@@ -49,7 +50,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         populationMutatorFactory,
                         populationMigratorFactory,
                         { reportContext ->
-                            ContextReporter(
+                            IslandContextReporter(
                                 reportContext,
                                 metricsActor.metricsChannel
                             )
@@ -61,12 +62,13 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
             val islandJobs = islandActors.map { it.start() }
 
             launch {
+                val routerReporter = FacilityContextReporter("R", metricsActor.metricsChannel)
                 for (emigrants in emigrantsChannel) {
                     val islandActorReceiver = islandActors
                         .find { it.id == (emigrants.senderId + 1) % islandsCount }
 
                     if (islandActorReceiver != null) {
-                        println("Sending ${emigrants.migrants.size} to actor ${islandActorReceiver.id}")
+                        routerReporter.log("Sending ${emigrants.migrants.size} migrants to actor ${islandActorReceiver.id}")
                         islandActorReceiver.immigrantsInputChannel.send(emigrants)
                     } else {
                         throw GenalgSimulationException("Tried to send migrants to non existing actor")
