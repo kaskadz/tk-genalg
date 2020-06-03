@@ -3,7 +3,7 @@ package pl.agh.edu.genalg.onemax
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.MigrationMessage
-import pl.agh.edu.genalg.framework.Reporter
+import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.flow.PopulationMigrator
 import pl.agh.edu.genalg.framework.model.Population
 import kotlin.math.roundToInt

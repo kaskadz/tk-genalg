@@ -1,4 +1,4 @@
-package pl.agh.edu.genalg.framework
+package pl.agh.edu.genalg.framework.metrics
 
 import kotlinx.coroutines.channels.SendChannel
 
@@ -15,11 +15,24 @@ class ContextReporter(
 ) : Reporter {
 
     override suspend fun log(message: String) {
-        metricsChannel.send(Log(reportContext.iterationCountProvider(), reportContext.islandId, message))
+        metricsChannel.send(
+            Log(
+                reportContext.iterationCountProvider(),
+                reportContext.islandId,
+                message
+            )
+        )
     }
 
     override suspend fun metric(key: String, value: Any) {
-        metricsChannel.send(Metric(reportContext.iterationCountProvider(), reportContext.islandId, key, value))
+        metricsChannel.send(
+            Metric(
+                reportContext.iterationCountProvider(),
+                reportContext.islandId,
+                key,
+                value
+            )
+        )
     }
 
 }

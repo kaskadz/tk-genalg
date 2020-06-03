@@ -1,6 +1,6 @@
 package pl.agh.edu.genalg.onemax
 
-import pl.agh.edu.genalg.framework.Reporter
+import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.flow.PopulationEvaluator
 
 class OneMaxPopulationEvaluator(hyperparameters: OneMaxHyperparameters, reporter: Reporter) :

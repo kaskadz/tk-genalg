@@ -5,6 +5,9 @@ import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import pl.agh.edu.genalg.framework.flow.*
+import pl.agh.edu.genalg.framework.metrics.ContextReporter
+import pl.agh.edu.genalg.framework.metrics.MetricsActor
+import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
 import pl.agh.edu.genalg.framework.model.Hyperparameters
@@ -45,7 +48,12 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         populationRecombinatorFactory,
                         populationMutatorFactory,
                         populationMigratorFactory,
-                        { reportContext -> ContextReporter(reportContext, metricsActor.metricsChannel) }
+                        { reportContext ->
+                            ContextReporter(
+                                reportContext,
+                                metricsActor.metricsChannel
+                            )
+                        }
                     )
                 }.toList()
 

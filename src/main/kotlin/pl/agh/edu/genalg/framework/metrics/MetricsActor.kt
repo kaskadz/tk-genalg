@@ -1,4 +1,4 @@
-package pl.agh.edu.genalg.framework
+package pl.agh.edu.genalg.framework.metrics
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import kotlinx.coroutines.CoroutineScope

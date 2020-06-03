@@ -6,6 +6,8 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.flow.*
+import pl.agh.edu.genalg.framework.metrics.ReportContext
+import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
 import pl.agh.edu.genalg.framework.model.Hyperparameters

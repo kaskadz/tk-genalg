@@ -1,4 +1,4 @@
-package pl.agh.edu.genalg.framework
+package pl.agh.edu.genalg.framework.metrics
 
 sealed class MetricLike
 data class Log(val iteration: Int, val islandId: Int, val message: String): MetricLike()
