@@ -67,15 +67,16 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                 postRecombinationPopulation.size - selectedPopulation.size
             )
 
-            val postMutationPopulation = populationMutator.mutatePopulation(postRecombinationPopulation)
-
-            val postMigrationPopulation = populationMigrator.applyMigration(id, iterationCount, postMutationPopulation)
+            val postMigrationPopulation =
+                populationMigrator.applyMigration(id, iterationCount, postRecombinationPopulation)
             reporter.metric(
                 "migrationDelta",
-                postMigrationPopulation.size - postMutationPopulation.size
+                postMigrationPopulation.size - postRecombinationPopulation.size
             )
 
-            evaluatedPopulation = populationEvaluator.evaluatePopulation(postMigrationPopulation)
+            val postMutationPopulation = populationMutator.mutatePopulation(postMigrationPopulation)
+
+            evaluatedPopulation = populationEvaluator.evaluatePopulation(postMutationPopulation)
             reporter.metric("populationSize", evaluatedPopulation.size)
             delay((0..10).random().milliseconds)
         }
