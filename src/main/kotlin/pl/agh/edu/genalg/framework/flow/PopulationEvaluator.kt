@@ -11,7 +11,7 @@ abstract class PopulationEvaluator<E : Entity, F : EvaluatedEntity<E>, H : Hyper
     fun evaluatePopulation(population: Population<E>): EvaluatedPopulation<E, F> {
         val evaluatedEntities = population.entities.map { e ->
             evaluateEntity(e)
-        }.toList()
+        }
 
         return EvaluatedPopulation(evaluatedEntities)
     }
