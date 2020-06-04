@@ -29,7 +29,7 @@ class MetricsActor(
 
         val currentDateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd_hh-mm-ss")
-        val fileName = "${formatter.format(currentDateTime)}.csv"
+        val fileName = "metrics_${formatter.format(currentDateTime)}.csv"
 
         val rows = metrics.groupBy { Pair(it.islandId, it.iteration) }
             .map {
