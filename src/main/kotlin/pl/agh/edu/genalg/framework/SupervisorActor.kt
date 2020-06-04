@@ -1,6 +1,7 @@
 package pl.agh.edu.genalg.framework
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -98,7 +99,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         }
                     }
                     is FinishedAndStopAllResultsMessage -> {
-                        islandJobs.values.forEach { it.cancel() }
+                        islandJobs.values.forEach { it.cancelAndJoin() }
                         break@loop
                     }
                 }
