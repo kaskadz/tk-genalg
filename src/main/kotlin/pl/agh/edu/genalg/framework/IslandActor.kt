@@ -12,7 +12,7 @@ import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
 import pl.agh.edu.genalg.framework.model.Hyperparameters
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
+import kotlin.time.nanoseconds
 
 class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val id: Int,
@@ -78,7 +78,8 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
 
             evaluatedPopulation = populationEvaluator.evaluatePopulation(postMutationPopulation)
             reporter.metric("populationSize", evaluatedPopulation.size)
-            delay((0..10).random().milliseconds)
+
+            delay((0..10).random().nanoseconds)
         }
         reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
 
