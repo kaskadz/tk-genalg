@@ -10,10 +10,9 @@ abstract class PopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, H : Hy
     protected abstract fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E>
     protected abstract fun recombineSelectedPopulation(population: Population<E>): Population<E>
 
-    fun recombinePopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): Population<E> {
+    fun recombinePopulation(evaluatedPopulation: EvaluatedPopulation<E, F>): SemiEvaluatedPopulation<E, F> {
         val selectedPopulationToBeRecombined = selectPopulationToBeRecombined(evaluatedPopulation)
         val newOffspring = recombineSelectedPopulation(selectedPopulationToBeRecombined)
-        val newPopulation = (evaluatedPopulation.evaluatedEntities.map { it.entity } + newOffspring.entities)
-        return Population(newPopulation)
+        return SemiEvaluatedPopulation(newOffspring.entities, evaluatedPopulation.evaluatedEntities)
     }
 }

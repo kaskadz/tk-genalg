@@ -5,7 +5,8 @@ import kotlinx.coroutines.channels.SendChannel
 import pl.agh.edu.genalg.framework.MigrationMessage
 import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.flow.PopulationMigrator
-import pl.agh.edu.genalg.framework.model.Population
+import pl.agh.edu.genalg.framework.model.MigrationSelection
+import pl.agh.edu.genalg.framework.model.SemiEvaluatedPopulation
 import kotlin.math.roundToInt
 
 class OneMaxPopulationMigrator(
@@ -23,14 +24,17 @@ class OneMaxPopulationMigrator(
         return iterationCount % hyperparameters.iterationsCountBetweenMigrations == 0
     }
 
-    override fun selectEmigrants(population: Population<BinaryVector>): Pair<Collection<BinaryVector>, Collection<BinaryVector>> {
-        val numberOfEntitiesToMigrate = (population.size * hyperparameters.migrationRate).roundToInt()
+    override fun selectEmigrants(population: SemiEvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>): MigrationSelection<BinaryVector> {
+        val numberOfEntitiesToMigrate = (population.evaluatedEntities.size * hyperparameters.migrationRate).roundToInt()
+        val sortedByScore = population.evaluatedEntities.sortedByDescending { it.numberOfOnes }
 
-        val sortedByScore = population.entities.shuffled()
+        val emigrants = sortedByScore
+            .slice(0 until numberOfEntitiesToMigrate)
+            .map { it.entity }
+        val nonMigrants = sortedByScore
+            .slice(numberOfEntitiesToMigrate until sortedByScore.size)
+            .map { it.entity }
 
-        return Pair(
-            sortedByScore.slice(0 until numberOfEntitiesToMigrate),
-            sortedByScore.slice(numberOfEntitiesToMigrate until sortedByScore.size)
-        )
+        return MigrationSelection(emigrants, nonMigrants + population.entities)
     }
 }

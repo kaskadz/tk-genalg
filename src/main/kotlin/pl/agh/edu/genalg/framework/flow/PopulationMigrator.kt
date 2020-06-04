@@ -3,12 +3,10 @@ package pl.agh.edu.genalg.framework.flow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import pl.agh.edu.genalg.framework.GenalgSimulationException
 import pl.agh.edu.genalg.framework.MigrationMessage
 import pl.agh.edu.genalg.framework.metrics.Reporter
-import pl.agh.edu.genalg.framework.model.Entity
-import pl.agh.edu.genalg.framework.model.EvaluatedEntity
-import pl.agh.edu.genalg.framework.model.Hyperparameters
-import pl.agh.edu.genalg.framework.model.Population
+import pl.agh.edu.genalg.framework.model.*
 
 abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
@@ -17,23 +15,26 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
     private val emigrantsChannel: SendChannel<MigrationMessage<E>>
 ) {
     protected abstract fun shouldMigrate(iterationCount: Int): Boolean
-    protected abstract fun selectEmigrants(population: Population<E>): Pair<Collection<E>, Collection<E>>
+    protected abstract fun selectEmigrants(population: SemiEvaluatedPopulation<E, F>): MigrationSelection<E>
 
     @ExperimentalCoroutinesApi
     suspend fun applyMigration(
         actorId: Int,
         iterationCount: Int,
-        evaluatedPopulation: Population<E>
+        semiEvaluatedPopulation: SemiEvaluatedPopulation<E, F>
     ): Population<E> {
         val postMigrationPopulation = mutableListOf<E>()
-        if (evaluatedPopulation.entities.any() && shouldMigrate(iterationCount)) {
-            val (emigrants, nonMigrants) = selectEmigrants(evaluatedPopulation)
-            postMigrationPopulation.addAll(nonMigrants)
-            if (emigrants.any()) {
-                emigrantsChannel.send(MigrationMessage(actorId, emigrants))
+        if (semiEvaluatedPopulation.allEntities.any() && shouldMigrate(iterationCount)) {
+            val migrationSelection = selectEmigrants(semiEvaluatedPopulation)
+
+            validateSelection(migrationSelection, semiEvaluatedPopulation)
+
+            postMigrationPopulation.addAll(migrationSelection.nonMigrants)
+            if (migrationSelection.migrants.any()) {
+                emigrantsChannel.send(MigrationMessage(actorId, migrationSelection.migrants))
             }
         } else {
-            postMigrationPopulation.addAll(evaluatedPopulation.entities)
+            postMigrationPopulation.addAll(semiEvaluatedPopulation.allEntities)
         }
 
         fun pollImmigrants() = immigrantsChannel.poll()
@@ -46,5 +47,18 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
         }
 
         return Population(postMigrationPopulation)
+    }
+
+    private fun validateSelection(
+        migrationSelection: MigrationSelection<E>,
+        semiEvaluatedPopulation: SemiEvaluatedPopulation<E, F>
+    ) {
+        val selectionEntitiesCount = with(migrationSelection) {
+            migrants.size + nonMigrants.size
+        }
+
+        if (selectionEntitiesCount != semiEvaluatedPopulation.size) {
+            throw GenalgSimulationException("Invalid migrant selection")
+        }
     }
 }
