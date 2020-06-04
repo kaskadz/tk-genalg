@@ -14,7 +14,10 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
     private val immigrantsChannel: ReceiveChannel<MigrationMessage<E>>,
     private val emigrantsChannel: SendChannel<MigrationMessage<E>>
 ) {
-    protected abstract fun shouldMigrate(iterationCount: Int): Boolean
+    protected abstract fun shouldMigrate(
+        iterationCount: Int,
+        semiEvaluatedPopulation: SemiEvaluatedPopulation<E, F>
+    ): Boolean
     protected abstract fun selectEmigrants(population: SemiEvaluatedPopulation<E, F>): MigrationSelection<E>
 
     @ExperimentalCoroutinesApi
@@ -24,7 +27,7 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
         semiEvaluatedPopulation: SemiEvaluatedPopulation<E, F>
     ): Population<E> {
         val postMigrationPopulation = mutableListOf<E>()
-        if (semiEvaluatedPopulation.allEntities.any() && shouldMigrate(iterationCount)) {
+        if (semiEvaluatedPopulation.allEntities.any() && shouldMigrate(iterationCount, semiEvaluatedPopulation)) {
             val migrationSelection = selectEmigrants(semiEvaluatedPopulation)
 
             validateSelection(migrationSelection, semiEvaluatedPopulation)

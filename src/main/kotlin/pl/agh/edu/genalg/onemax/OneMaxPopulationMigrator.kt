@@ -20,7 +20,10 @@ class OneMaxPopulationMigrator(
     immigrantsChannel,
     emigrantsChannel
 ) {
-    override fun shouldMigrate(iterationCount: Int): Boolean {
+    override fun shouldMigrate(
+        iterationCount: Int,
+        semiEvaluatedPopulation: SemiEvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>
+    ): Boolean {
         return iterationCount % hyperparameters.iterationsCountBetweenMigrations == 0
     }
 
