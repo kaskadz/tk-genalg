@@ -11,4 +11,5 @@ abstract class StopCondition<E : Entity, F : EvaluatedEntity<E>, H : Hyperparame
     val reporter: Reporter
 ) {
     abstract fun shouldStop(iterationCount: Int, evaluatedPopulation: EvaluatedPopulation<E, F>): Boolean
+    abstract fun shouldAllStop(iterationCount: Int, evaluatedPopulation: EvaluatedPopulation<E, F>): Boolean
 }

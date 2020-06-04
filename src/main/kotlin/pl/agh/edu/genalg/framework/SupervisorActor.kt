@@ -58,36 +58,55 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                             )
                         }
                     )
-                }.toList()
+                }.associateBy { it.id }
 
             val metricsActorJob = metricsActor.start()
-            val islandJobs = islandActors.map { it.start() }
+            val islandJobs = islandActors.values.associate { it.id to it.start() }
 
             launch {
                 val routerReporter = FacilityContextReporter("R", metricsActor.metricsChannel)
                 for (emigrants in emigrantsChannel) {
-                    val islandActorReceiver = islandActors
-                        .find { it.id == (emigrants.senderId + 1) % islandsCount }
+                    val islandActorReceiver = islandActors[(emigrants.senderId + 1) % islandsCount]
 
                     if (islandActorReceiver != null) {
-                        routerReporter.log("Sending ${emigrants.migrants.size} migrants to actor ${islandActorReceiver.id}")
-                        islandActorReceiver.immigrantsInputChannel.send(emigrants)
+                        try {
+                            islandActorReceiver.immigrantsInputChannel.send(emigrants)
+                            routerReporter.log("Sent ${emigrants.migrants.size} migrants to actor ${islandActorReceiver.id}")
+                        } catch (e: ClosedSendChannelException) {
+                            if (islandJobs[islandActorReceiver.id]?.isCancelled ?: false) {
+                                routerReporter.log(
+                                    "Discarding ${emigrants.migrants.size} migrants meant to be sent to actor ${islandActorReceiver.id}." +
+                                            " Immigrants channel was closed because of cancellation."
+                                )
+                            }
+                        }
                     } else {
                         throw GenalgSimulationException("Tried to send migrants to non existing actor")
                     }
                 }
             }
 
-            val resultList = resultChannel
-                .take(islandsCount)
-                .toList()
-                .map { it.results }
-                .flatten()
-                .toList()
+            var finishedActorsCount = 0
+            val resultList = mutableListOf<F>()
+            loop@ for (result in resultChannel) {
+                finishedActorsCount++;
+                resultList.addAll(result.results)
+                when (result) {
+                    is FinishedResultsMessage -> {
+                        if (finishedActorsCount >= islandsCount) {
+                            break@loop
+                        }
+                    }
+                    is FinishedAndStopAllResultsMessage -> {
+                        islandJobs.values.forEach { it.cancel() }
+                        break@loop
+                    }
+                }
+            }
 
-            islandActors.forEach { it.immigrantsInputChannel.close() }
+            islandActors.values.forEach { it.immigrantsInputChannel.close() }
             emigrantsChannel.close()
-            islandJobs.forEach { it.join() }
+            islandJobs.values.forEach { it.join() }
 
             metricsActorJob.cancel()
             metricsActorJob.join()

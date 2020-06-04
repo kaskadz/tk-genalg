@@ -1,12 +1,15 @@
 package pl.agh.edu.genalg.framework.flow
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.isActive
 import pl.agh.edu.genalg.framework.GenalgSimulationException
 import pl.agh.edu.genalg.framework.MigrationMessage
 import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.*
+import kotlin.coroutines.coroutineContext
 
 abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
@@ -18,6 +21,7 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
         iterationCount: Int,
         semiEvaluatedPopulation: SemiEvaluatedPopulation<E, F>
     ): Boolean
+
     protected abstract fun selectEmigrants(population: SemiEvaluatedPopulation<E, F>): MigrationSelection<E>
 
     @ExperimentalCoroutinesApi
@@ -34,13 +38,37 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
 
             postMigrationPopulation.addAll(migrationSelection.nonMigrants)
             if (migrationSelection.migrants.any()) {
-                emigrantsChannel.send(MigrationMessage(actorId, migrationSelection.migrants))
+                try {
+                    emigrantsChannel.send(MigrationMessage(actorId, migrationSelection.migrants))
+                } catch (e: ClosedSendChannelException) {
+                    if (!coroutineContext.isActive) {
+                        reporter.log(
+                            "Discarding ${migrationSelection.migrants.size} emigrants," +
+                                    " emigrants channel was closed because of cancellation."
+                        )
+                    } else {
+                        throw e
+                    }
+                }
             }
         } else {
             postMigrationPopulation.addAll(semiEvaluatedPopulation.allEntities)
         }
 
-        fun pollImmigrants() = immigrantsChannel.poll()
+        suspend fun pollImmigrants(): MigrationMessage<E>? = runCatching {
+            immigrantsChannel.poll()
+        }.onFailure {
+            when (it) {
+                is ClosedSendChannelException -> {
+                    if (!coroutineContext.isActive) {
+                        reporter.log("Poll immigrants failed, because of cancellation")
+                    } else {
+                        throw it
+                    }
+                }
+                else -> throw it
+            }
+        }.getOrNull()
 
         var immigrants = pollImmigrants()
         while (immigrants != null) {

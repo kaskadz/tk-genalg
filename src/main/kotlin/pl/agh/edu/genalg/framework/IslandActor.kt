@@ -49,53 +49,68 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     @ExperimentalTime
     @ExperimentalCoroutinesApi
     fun start() = coroutineScope.launch(Dispatchers.Unconfined) {
-        reporter.log("started")
+        try {
+            reporter.log("started")
 
-        val population = populationInitializer.initializePopulation()
-        reporter.metric("populationSize", population.size)
+            val population = populationInitializer.initializePopulation()
+            reporter.metric("populationSize", population.size)
 
-        var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
+            var evaluatedPopulation = populationEvaluator.evaluatePopulation(population)
 
-        while (isActive && !stopCondition.shouldStop(++iterationCount, evaluatedPopulation)) {
-            val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
-            reporter.metric(
-                "entitiesDied",
-                evaluatedPopulation.size - selectedPopulation.size
-            )
+            var shouldAllStop = false
+            while (isActive
+                && !stopCondition.shouldAllStop(++iterationCount, evaluatedPopulation)
+                    .also { shouldAllStop = it }
+                && !stopCondition.shouldStop(iterationCount, evaluatedPopulation)
+            ) {
+                val selectedPopulation = populationSelector.selectPopulation(evaluatedPopulation)
+                reporter.metric(
+                    "entitiesDied",
+                    evaluatedPopulation.size - selectedPopulation.size
+                )
 
-            val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
-            reporter.metric(
-                "entitiesBorn",
-                postRecombinationPopulation.size - selectedPopulation.size
-            )
+                val postRecombinationPopulation = populationRecombinator.recombinePopulation(selectedPopulation)
+                reporter.metric(
+                    "entitiesBorn",
+                    postRecombinationPopulation.size - selectedPopulation.size
+                )
 
-            val postMigrationPopulation =
-                populationMigrator.applyMigration(id, iterationCount, postRecombinationPopulation)
-            reporter.metric(
-                "migrationDelta",
-                postMigrationPopulation.size - postRecombinationPopulation.size
-            )
+                val postMigrationPopulation =
+                    populationMigrator.applyMigration(id, iterationCount, postRecombinationPopulation)
+                reporter.metric(
+                    "migrationDelta",
+                    postMigrationPopulation.size - postRecombinationPopulation.size
+                )
 
-            val postMutationPopulation = populationMutator.mutatePopulation(postMigrationPopulation)
+                val postMutationPopulation = populationMutator.mutatePopulation(postMigrationPopulation)
 
-            evaluatedPopulation = populationEvaluator.evaluatePopulation(postMutationPopulation)
-            reporter.metric("populationSize", evaluatedPopulation.size)
+                evaluatedPopulation = populationEvaluator.evaluatePopulation(postMutationPopulation)
+                reporter.metric("populationSize", evaluatedPopulation.size)
 
-            delay((0..10).random().nanoseconds)
-        }
-        reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
+                delay((0..10).random().nanoseconds)
+            }
+            reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
+            if (shouldAllStop) {
+                reporter.log("stopAll")
+            }
 
-        val selectedResults = resultHandler.selectResults(evaluatedPopulation)
-        resultChannel.send(ResultsMessage(selectedResults))
+            val resultsMessage = resultHandler.selectResults(evaluatedPopulation)
+                .let { if (shouldAllStop) FinishedAndStopAllResultsMessage(it) else FinishedResultsMessage(it) }
 
-        for (immigrants in immigrantsChannel) {
-            try {
-                emigrantsChannel.send(MigrationMessage(id, immigrants.migrants))
-            } catch (e: ClosedSendChannelException) {
-                if (immigrants.migrants.any()) {
-                    reporter.log("Discarding ${immigrants.migrants.size} migrants. Emigrants channel closed.")
+            resultChannel.send(resultsMessage)
+
+            for (immigrants in immigrantsChannel) {
+                try {
+                    emigrantsChannel.send(MigrationMessage(id, immigrants.migrants))
+                } catch (e: ClosedSendChannelException) {
+                    if (immigrants.migrants.any() && !isActive) {
+                        reporter.log("Discarding ${immigrants.migrants.size} migrants." +
+                                " Emigrants channel closed because of cancellation.")
+                    }
                 }
             }
+        } finally {
+            reporter.log("stopped")
         }
     }
 }

@@ -15,4 +15,11 @@ class OneMaxStopCondition(hyperparameters: OneMaxHyperparameters, reporter: Repo
                 || evaluatedPopulation.size <= hyperparameters.minimalPopulationSize
                 || evaluatedPopulation.evaluatedEntities.any { it.numberOfOnes == hyperparameters.vectorSize }
     }
+
+    override fun shouldAllStop(
+        iterationCount: Int,
+        evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>
+    ): Boolean {
+        return evaluatedPopulation.evaluatedEntities.any { it.numberOfOnes == hyperparameters.vectorSize }
+    }
 }
