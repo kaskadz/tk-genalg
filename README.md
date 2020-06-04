@@ -8,7 +8,7 @@ _Generic, island based genetic simulation framework._
 - [x] Update gene generation to use random double instead of int
 - [x] Make migrator receive evaluated population (in order for it to make decisions based on entity's fitness)
 - [x] Find the shortest delay interval
-- [ ] Add 'allstop' condition
 - [ ] Refactor handling the results
+- [ ] Add 'allstop' condition
 - [ ] Add noise to simulation model implementation
 - [ ] Introduce an interface for each component

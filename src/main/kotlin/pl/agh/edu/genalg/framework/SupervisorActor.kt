@@ -22,7 +22,8 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationSelectorFactory: (H, Reporter) -> PopulationSelector<E, F, H>,
     private val populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
     private val populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
-    private val populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>
+    private val populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
+    private val resultHandlerFactory: (H, Reporter) -> ResultHandler<E, F, H>
 ) {
 
     @ExperimentalTime
@@ -49,6 +50,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         populationRecombinatorFactory,
                         populationMutatorFactory,
                         populationMigratorFactory,
+                        resultHandlerFactory,
                         { reportContext ->
                             IslandContextReporter(
                                 reportContext,

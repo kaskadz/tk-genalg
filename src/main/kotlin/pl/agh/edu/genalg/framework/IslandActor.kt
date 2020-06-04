@@ -28,6 +28,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
     populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
     populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
+    resultHandlerFactory: (H, Reporter) -> ResultHandler<E, F, H>,
     reporterFactory: (IslandReportContext) -> Reporter
 ) {
     val immigrantsInputChannel: SendChannel<MigrationMessage<E>> = immigrantsChannel
@@ -43,6 +44,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationMutator = populationMutatorFactory(hyperparameters, reporter)
     private val populationMigrator =
         populationMigratorFactory(hyperparameters, reporter, immigrantsChannel, emigrantsChannel)
+    private val resultHandler = resultHandlerFactory(hyperparameters, reporter)
 
     @ExperimentalTime
     @ExperimentalCoroutinesApi
@@ -83,7 +85,8 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
         }
         reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
 
-        resultChannel.send(ResultsMessage(evaluatedPopulation.evaluatedEntities))
+        val selectedResults = resultHandler.selectResults(evaluatedPopulation)
+        resultChannel.send(ResultsMessage(selectedResults))
 
         for (immigrants in immigrantsChannel) {
             try {

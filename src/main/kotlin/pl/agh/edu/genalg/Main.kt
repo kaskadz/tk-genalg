@@ -30,7 +30,8 @@ fun main() {
         { h, r -> OneMaxPopulationSelector(h, r) },
         { h, r -> OneMaxPopulationRecombinator(h, r) },
         { h, r -> OneMaxPopulationMutator(h, r) },
-        { h, r, c1, c2 -> OneMaxPopulationMigrator(h, r, c1, c2) }
+        { h, r, c1, c2 -> OneMaxPopulationMigrator(h, r, c1, c2) },
+        { h, r -> OneMaxResultHandler(h, r)}
     )
 
     println("start")
@@ -39,7 +40,6 @@ fun main() {
         supervisorActor.runSimulation(5) { results ->
             results
                 .sortedByDescending { it.numberOfOnes }
-                .take(10)
                 .forEach { println(it) }
         }
     }
