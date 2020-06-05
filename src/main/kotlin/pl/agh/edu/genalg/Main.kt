@@ -88,7 +88,6 @@ private fun oneMax() {
         { h, r -> OneMaxIterationReporter(h, r) }
     )
 
-
     runBlocking {
         supervisorActor.runSimulation(5) { results ->
             results

@@ -7,7 +7,6 @@ class QueensPopulationEvaluator(hyperparameters: QueensHyperparameters, reporter
     PopulationEvaluator<Queens, EvaluatedQueens, QueensHyperparameters>(hyperparameters, reporter) {
 
     override fun evaluateEntity(entity: Queens): EvaluatedQueens {
-
         val rowsWithQueens = mutableSetOf<Int>()
         val colsWithQueens = mutableSetOf<Int>()
         val neDiagonalsWithQueens = mutableSetOf<Int>()
