@@ -18,7 +18,7 @@ class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters, repor
     override fun recombineCouple(entity1: BinaryVector, entity2: BinaryVector): BinaryVector {
         val cutPoint = random.nextInt(0, hyperparameters.vectorSize)
         val slice1 = entity1.genes.sliceArray(0 until cutPoint)
-        val slice2 = entity2.genes.sliceArray(cutPoint until 100)
+        val slice2 = entity2.genes.sliceArray(cutPoint until hyperparameters.vectorSize)
 
         return BinaryVector(slice1 + slice2)
     }

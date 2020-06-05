@@ -24,7 +24,8 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationRecombinatorFactory: (H, Reporter) -> PopulationRecombinator<E, F, H>,
     private val populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
     private val populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
-    private val resultHandlerFactory: (H, Reporter) -> ResultHandler<E, F, H>
+    private val resultHandlerFactory: (H, Reporter) -> ResultHandler<E, F, H>,
+    private val iterationReporterFactory: (H, Reporter) -> IterationReporter<E, F, H>
 ) {
 
     @ExperimentalTime
@@ -52,6 +53,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                         populationMutatorFactory,
                         populationMigratorFactory,
                         resultHandlerFactory,
+                        iterationReporterFactory,
                         { reportContext ->
                             IslandContextReporter(
                                 reportContext,
@@ -72,7 +74,7 @@ class SupervisorActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                     if (islandActorReceiver != null) {
                         try {
                             islandActorReceiver.immigrantsInputChannel.send(emigrants)
-                            routerReporter.log("Sent ${emigrants.migrants.size} migrants to actor ${islandActorReceiver.id}")
+//                            routerReporter.log("Sent ${emigrants.migrants.size} migrants to actor ${islandActorReceiver.id}")
                         } catch (e: ClosedSendChannelException) {
                             if (islandJobs[islandActorReceiver.id]?.isCancelled ?: false) {
                                 routerReporter.log(

@@ -16,12 +16,12 @@ class EvaluatedBinaryVector(entity: BinaryVector, val numberOfOnes: Int) : Evalu
 class OneMaxHyperparameters(
     maxIterationsCount: Int,
     initialPopulationSize: Int,
+    mutationRate: Double,
     val vectorSize: Int,
     val deathRate: Double,
     val reproductionRate: Double,
-    val mutationRate: Double,
     val mutationMaxScope: Double,
     val migrationRate: Double,
     val iterationsCountBetweenMigrations: Int,
     val minimalPopulationSize: Int
-) : Hyperparameters(maxIterationsCount, initialPopulationSize)
+) : Hyperparameters(maxIterationsCount, initialPopulationSize, mutationRate)

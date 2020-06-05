@@ -2,6 +2,7 @@ package pl.agh.edu.genalg.framework.flow
 
 import pl.agh.edu.genalg.framework.metrics.Reporter
 import pl.agh.edu.genalg.framework.model.*
+import kotlin.random.Random
 
 abstract class PopulationMutator<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     val hyperparameters: H,
@@ -12,7 +13,9 @@ abstract class PopulationMutator<E : Entity, F : EvaluatedEntity<E>, H : Hyperpa
     fun mutatePopulation(
         population: Population<E>
     ): Population<E> {
-        val mutatedPopulation = population.entities.map { mutateEntity(it) }
+        val mutatedPopulation = population.entities.map {
+            if (Random.nextDouble() < hyperparameters.mutationRate) mutateEntity(it) else it
+        }
         return Population(mutatedPopulation)
     }
 }

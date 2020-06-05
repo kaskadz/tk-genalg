@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.SendChannel
 
 interface Reporter {
     suspend fun log(message: String)
-    suspend fun metric(key: String, value: Any)
+    suspend fun metric(key: String, value: Any?)
 }
 
 class IslandReportContext(val islandId: Int, val iterationCountProvider: () -> Int)
@@ -24,7 +24,7 @@ class IslandContextReporter(
         )
     }
 
-    override suspend fun metric(key: String, value: Any) {
+    override suspend fun metric(key: String, value: Any?) {
         metricsChannel.send(
             Metric(
                 reportContext.iterationCountProvider(),
@@ -45,7 +45,7 @@ class FacilityContextReporter(private val origin: String, private val metricsCha
         )
     }
 
-    override suspend fun metric(key: String, value: Any) {
+    override suspend fun metric(key: String, value: Any?) {
         metricsChannel.send(
             Metric(-1, -1, key, value)
         )

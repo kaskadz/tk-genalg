@@ -29,6 +29,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     populationMutatorFactory: (H, Reporter) -> PopulationMutator<E, F, H>,
     populationMigratorFactory: (H, Reporter, ReceiveChannel<MigrationMessage<E>>, SendChannel<MigrationMessage<E>>) -> PopulationMigrator<E, F, H>,
     resultHandlerFactory: (H, Reporter) -> ResultHandler<E, F, H>,
+    iterationReporterFactory: (H, Reporter) -> IterationReporter<E, F, H>,
     reporterFactory: (IslandReportContext) -> Reporter
 ) {
     val immigrantsInputChannel: SendChannel<MigrationMessage<E>> = immigrantsChannel
@@ -45,6 +46,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
     private val populationMigrator =
         populationMigratorFactory(hyperparameters, reporter, immigrantsChannel, emigrantsChannel)
     private val resultHandler = resultHandlerFactory(hyperparameters, reporter)
+    private val iterationReporter = iterationReporterFactory(hyperparameters, reporter)
 
     @ExperimentalTime
     @ExperimentalCoroutinesApi
@@ -87,6 +89,8 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                 evaluatedPopulation = populationEvaluator.evaluatePopulation(postMutationPopulation)
                 reporter.metric("populationSize", evaluatedPopulation.size)
 
+                iterationReporter.report(iterationCount, evaluatedPopulation)
+
                 delay((0..10).random().nanoseconds)
             }
             reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
@@ -104,8 +108,10 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
                     emigrantsChannel.send(MigrationMessage(id, immigrants.migrants))
                 } catch (e: ClosedSendChannelException) {
                     if (immigrants.migrants.any() && !isActive) {
-                        reporter.log("Discarding ${immigrants.migrants.size} migrants." +
-                                " Emigrants channel closed because of cancellation.")
+                        reporter.log(
+                            "Discarding ${immigrants.migrants.size} migrants." +
+                                    " Emigrants channel closed because of cancellation."
+                        )
                     }
                 }
             }

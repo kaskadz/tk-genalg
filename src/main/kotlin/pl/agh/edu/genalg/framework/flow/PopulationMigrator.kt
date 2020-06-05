@@ -72,7 +72,7 @@ abstract class PopulationMigrator<E : Entity, F : EvaluatedEntity<E>, H : Hyperp
 
         var immigrants = pollImmigrants()
         while (immigrants != null) {
-            reporter.log("Receiving ${immigrants.migrants.size} immigrants from ${immigrants.senderId}")
+//            reporter.log("Receiving ${immigrants.migrants.size} immigrants from ${immigrants.senderId}")
             postMigrationPopulation.addAll(immigrants.migrants)
             immigrants = pollImmigrants()
         }

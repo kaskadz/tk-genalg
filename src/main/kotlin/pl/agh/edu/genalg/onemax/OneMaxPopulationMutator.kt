@@ -11,19 +11,15 @@ class OneMaxPopulationMutator(hyperparameters: OneMaxHyperparameters, reporter: 
     private val random = Random.Default
 
     override fun mutateEntity(entity: BinaryVector): BinaryVector {
-        return if (random.nextDouble() < hyperparameters.mutationRate) {
-            val percentageOfGenesToMutate = random.nextDouble(hyperparameters.mutationMaxScope)
-            val numberOfGenesToMutate = (hyperparameters.vectorSize * percentageOfGenesToMutate).roundToInt()
+        val percentageOfGenesToMutate = random.nextDouble(hyperparameters.mutationMaxScope)
+        val numberOfGenesToMutate = (hyperparameters.vectorSize * percentageOfGenesToMutate).roundToInt()
 
-            repeat(numberOfGenesToMutate) {
-                val geneToMutateIndex = random.nextInt(hyperparameters.vectorSize)
-                val gene = entity.genes[geneToMutateIndex]
-                entity.genes[geneToMutateIndex] = (gene + 1) % 2
-            }
-
-            entity
-        } else {
-            entity
+        repeat(numberOfGenesToMutate) {
+            val geneToMutateIndex = random.nextInt(hyperparameters.vectorSize)
+            val gene = entity.genes[geneToMutateIndex]
+            entity.genes[geneToMutateIndex] = (gene + 1) % 2
         }
+
+        return entity
     }
 }
