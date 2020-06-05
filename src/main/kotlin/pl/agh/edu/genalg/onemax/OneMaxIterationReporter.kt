@@ -10,6 +10,15 @@ class OneMaxIterationReporter(hyperparameters: OneMaxHyperparameters, reporter: 
         iterationCount: Int,
         evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>
     ) {
+        val results = evaluatedPopulation.evaluatedEntities.map { it.numberOfOnes }
+        val best = results.max()
+        val mean = results.average()
 
+        reporter.metric("best", best)
+        reporter.metric("mean", mean)
+
+        if (iterationCount % 100 == 0) {
+            reporter.log("Best=$best; Mean=$mean")
+        }
     }
 }
