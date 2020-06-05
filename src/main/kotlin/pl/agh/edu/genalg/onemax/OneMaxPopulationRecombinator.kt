@@ -29,6 +29,7 @@ class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters, repor
 
         val entitiesChosenToRecombine = evaluatedPopulation.evaluatedEntities
             .sortedByDescending { it.numberOfOnes }
+//            .shuffled()
             .take(numberOfEntitiesChosenToRecombine)
             .map { it.entity }
 
