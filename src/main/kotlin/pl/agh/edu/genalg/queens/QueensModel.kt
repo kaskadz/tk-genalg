@@ -73,5 +73,6 @@ class QueensHyperparameters(
     val migrationRate: Double,
     val iterationsCountBetweenMigrations: Int,
     val minimalPopulationSize: Int,
-    val maxNumberOfQueensToMutate: Int
+    val maxNumberOfQueensToMutate: Int,
+    val tournamentSize: Int
 ) : Hyperparameters(maxIterationsCount, initialPopulationSize, mutationRate)

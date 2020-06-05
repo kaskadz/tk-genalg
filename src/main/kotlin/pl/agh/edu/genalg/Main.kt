@@ -30,7 +30,8 @@ private fun queens() {
         mutationRate = 0.5,
         iterationsCountBetweenMigrations = 10,
         minimalPopulationSize = 2,
-        maxNumberOfQueensToMutate = 1
+        maxNumberOfQueensToMutate = 1,
+        tournamentSize = 10
     )
 
     val supervisorActor = SupervisorActor(
@@ -38,7 +39,8 @@ private fun queens() {
         { h, r -> QueensPopulationInitializer(h, r) },
         { h, r -> QueensPopulationEvaluator(h, r) },
         { h, r -> QueensStopCondition(h, r) },
-        { h, r -> QueensPopulationSelector(h, r) },
+        { h, r -> QueensTournamentPopulationSelector(h, r) },
+//        { h, r -> QueensPopulationSelector(h, r) },
         { h, r -> QueensPopulationRecombinator(h, r) },
         { h, r -> QueensPopulationMutator(h, r) },
         { h, r, c1, c2 -> QueensPopulationMigrator(h, r, c1, c2) },
