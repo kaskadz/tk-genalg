@@ -10,7 +10,9 @@ class OneMaxResultHandler(
 ) :
     ResultHandler<BinaryVector, EvaluatedBinaryVector, OneMaxHyperparameters>(hyperparameters, reporter) {
 
-    override fun selectResults(results: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>): Collection<EvaluatedBinaryVector> {
+    override fun selectResults(
+        results: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>
+    ): Collection<EvaluatedBinaryVector> {
         return results.evaluatedEntities
             .sortedByDescending { it.numberOfOnes }
             .take(1)
