@@ -4,34 +4,31 @@ import pl.agh.edu.genalg.framework.model.Entity
 import pl.agh.edu.genalg.framework.model.EvaluatedEntity
 import pl.agh.edu.genalg.framework.model.Hyperparameters
 
-const val BoardSize = 8
-const val QueensCount = 8
-
 fun <T> Iterable<T>.takeRandom(count: Int): Iterable<T> {
     return this.shuffled().take(count)
 }
 
 data class Position(val rowNum: Int, val colNum: Int) {
     companion object Factory {
-        fun getRandom(count: Int): List<Position> {
-            return (0 until (BoardSize * BoardSize))
+        fun getRandom(boardSize: Int, count: Int): List<Position> {
+            return (0 until (boardSize * boardSize))
                 .takeRandom(count)
                 .map {
-                    Position(it / BoardSize, it % BoardSize)
+                    Position(it / boardSize, it % boardSize)
                 }
         }
 
-        fun getRandom(): Position {
-            return (0 until (BoardSize * BoardSize))
+        fun getRandom(boardSize: Int): Position {
+            return (0 until (boardSize * boardSize))
                 .random()
                 .let {
-                    Position(it / BoardSize, it % BoardSize)
+                    Position(it / boardSize, it % boardSize)
                 }
         }
     }
 }
 
-class Queens(val positions: Set<Position>) : Entity {
+class Queens(val positions: Set<Position>, private val boardSize: Int) : Entity {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -50,8 +47,8 @@ class Queens(val positions: Set<Position>) : Entity {
 
     override fun toString(): String {
         return buildString {
-            for (row in 0 until BoardSize) {
-                for (col in 0 until BoardSize) {
+            for (row in 0 until boardSize) {
+                for (col in 0 until boardSize) {
                     val char = if (positions.contains(Position(row, col))) 'Q' else '.'
                     append(char)
                 }
@@ -74,5 +71,6 @@ class QueensHyperparameters(
     val iterationsCountBetweenMigrations: Int,
     val minimalPopulationSize: Int,
     val maxNumberOfQueensToMutate: Int,
-    val tournamentSize: Int
+    val tournamentSize: Int,
+    val boardSize: Int
 ) : Hyperparameters(maxIterationsCount, initialPopulationSize, mutationRate)

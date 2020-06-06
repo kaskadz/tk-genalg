@@ -8,11 +8,11 @@ class QueensPopulationInitializer(hyperparameters: QueensHyperparameters, report
     PopulationInitializer<Queens, QueensHyperparameters>(hyperparameters, reporter) {
 
     override fun initializeEntity(): Queens {
-        val positions = Position.getRandom(QueensCount).toSet()
+        val positions = Position.getRandom(hyperparameters.boardSize, hyperparameters.boardSize).toSet()
 
-        if (positions.size != QueensCount)
+        if (positions.size != hyperparameters.boardSize)
             throw GenalgSimulationException("Generated invalid number of queens.")
 
-        return Queens(positions)
+        return Queens(positions, hyperparameters.boardSize)
     }
 }

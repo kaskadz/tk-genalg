@@ -13,11 +13,11 @@ class QueensPopulationMutator(hyperparameters: QueensHyperparameters, reporter: 
             .takeRandom(hyperparameters.maxNumberOfQueensToMutate)
             .forEach { p ->
                 newPositions -= p
-                val newPosition = generateSequence { Position.getRandom() }
+                val newPosition = generateSequence { Position.getRandom(hyperparameters.boardSize) }
                     .first { !newPositions.contains(it) }
                 newPositions += newPosition
             }
 
-        return Queens(newPositions)
+        return Queens(newPositions, hyperparameters.boardSize)
     }
 }

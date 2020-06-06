@@ -22,7 +22,7 @@ fun main() {
 @ExperimentalTime
 private fun queens() {
     val hyperparameters = QueensHyperparameters(
-        maxIterationsCount = 1000,
+        maxIterationsCount = 10000,
         initialPopulationSize = 100,
         deathRate = 0.3,
         reproductionRate = 0.3 / 0.7,
@@ -31,7 +31,8 @@ private fun queens() {
         iterationsCountBetweenMigrations = 10,
         minimalPopulationSize = 2,
         maxNumberOfQueensToMutate = 1,
-        tournamentSize = 10
+        tournamentSize = 10,
+        boardSize = 10
     )
 
     val supervisorActor = SupervisorActor(

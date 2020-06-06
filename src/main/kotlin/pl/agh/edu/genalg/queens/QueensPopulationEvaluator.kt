@@ -16,11 +16,11 @@ class QueensPopulationEvaluator(hyperparameters: QueensHyperparameters, reporter
             rowsWithQueens.add(pos.rowNum)
             colsWithQueens.add(pos.colNum)
             neDiagonalsWithQueens.add(pos.rowNum + pos.colNum)
-            seDiagonalsWithQueens.add(BoardSize - 1 - pos.rowNum - pos.colNum)
+            seDiagonalsWithQueens.add(hyperparameters.boardSize - 1 - pos.rowNum - pos.colNum)
         }
 
         val fitness =
-            BoardSize * 4 - (rowsWithQueens.size + colsWithQueens.size + neDiagonalsWithQueens.size + seDiagonalsWithQueens.size)
+            hyperparameters.boardSize * 4 - (rowsWithQueens.size + colsWithQueens.size + neDiagonalsWithQueens.size + seDiagonalsWithQueens.size)
 
         return EvaluatedQueens(entity, fitness)
     }

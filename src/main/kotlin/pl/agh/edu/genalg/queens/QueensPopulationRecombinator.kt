@@ -11,21 +11,21 @@ class QueensPopulationRecombinator(hyperparameters: QueensHyperparameters, repor
     CouplePopulationRecombinator<Queens, EvaluatedQueens, QueensHyperparameters>(hyperparameters, reporter) {
 
     override fun recombineCouple(entity1: Queens, entity2: Queens): Queens {
-        val cutPoint = Random.nextInt(0, QueensCount)
+        val cutPoint = Random.nextInt(0, hyperparameters.boardSize)
 
         val part1 = entity1.positions.toTypedArray().sliceArray(0 until cutPoint)
-        val part2 = entity2.positions.toTypedArray().sliceArray(cutPoint until QueensCount)
+        val part2 = entity2.positions.toTypedArray().sliceArray(cutPoint until hyperparameters.boardSize)
 
         val newPositions = (part1 + part2).toMutableSet()
 
-        while (newPositions.size < QueensCount) {
-            val newPosition = generateSequence { Position.getRandom() }
+        while (newPositions.size < hyperparameters.boardSize) {
+            val newPosition = generateSequence { Position.getRandom(hyperparameters.boardSize) }
                 .first { !newPositions.contains(it) }
 
             newPositions += newPosition
         }
 
-        return Queens(newPositions)
+        return Queens(newPositions, hyperparameters.boardSize)
     }
 
     override fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<Queens, EvaluatedQueens>): Population<Queens> {
