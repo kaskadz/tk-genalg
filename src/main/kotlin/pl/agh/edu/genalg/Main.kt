@@ -50,7 +50,7 @@ private fun queens() {
     )
 
     runBlocking {
-        supervisorActor.runSimulation(5) { results ->
+        supervisorActor.runSimulation(islandsCount = 5) { results ->
             results
                 .sortedBy { it.fitness }
                 .take(5)
