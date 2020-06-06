@@ -15,12 +15,12 @@ class OneMaxPopulationRecombinator(hyperparameters: OneMaxHyperparameters, repor
 
     private val random = Random.Default
 
-    override fun recombineCouple(entity1: BinaryVector, entity2: BinaryVector): BinaryVector {
+    override fun recombineCouple(entity1: BinaryVector, entity2: BinaryVector): Collection<BinaryVector> {
         val cutPoint = random.nextInt(0, hyperparameters.vectorSize)
         val slice1 = entity1.genes.sliceArray(0 until cutPoint)
         val slice2 = entity2.genes.sliceArray(cutPoint until hyperparameters.vectorSize)
 
-        return BinaryVector(slice1 + slice2)
+        return listOf(BinaryVector(slice1 + slice2))
     }
 
     override fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<BinaryVector, EvaluatedBinaryVector>): Population<BinaryVector> {

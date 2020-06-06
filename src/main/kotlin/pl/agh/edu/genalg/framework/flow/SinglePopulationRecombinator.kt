@@ -10,10 +10,10 @@ abstract class SinglePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, 
 
     override fun recombineSelectedPopulation(population: Population<E>): Population<E> {
         val newEntities = population.entities
-            .map { recombineSingle(it) }
+            .flatMap { recombineSingle(it) }
 
         return Population(newEntities)
     }
 
-    protected abstract fun recombineSingle(entity: E): E
+    protected abstract fun recombineSingle(entity: E): Collection<E>
 }

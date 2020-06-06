@@ -10,7 +10,7 @@ import kotlin.random.Random
 class QueensPopulationRecombinator(hyperparameters: QueensHyperparameters, reporter: Reporter) :
     CouplePopulationRecombinator<Queens, EvaluatedQueens, QueensHyperparameters>(hyperparameters, reporter) {
 
-    override fun recombineCouple(entity1: Queens, entity2: Queens): Queens {
+    override fun recombineCouple(entity1: Queens, entity2: Queens): Collection<Queens> {
         val cutPoint = Random.nextInt(0, hyperparameters.boardSize)
 
         val part1 = entity1.positions.toTypedArray().sliceArray(0 until cutPoint)
@@ -25,7 +25,7 @@ class QueensPopulationRecombinator(hyperparameters: QueensHyperparameters, repor
             newPositions += newPosition
         }
 
-        return Queens(newPositions, hyperparameters.boardSize)
+        return listOf(Queens(newPositions, hyperparameters.boardSize))
     }
 
     override fun selectPopulationToBeRecombined(evaluatedPopulation: EvaluatedPopulation<Queens, EvaluatedQueens>): Population<Queens> {

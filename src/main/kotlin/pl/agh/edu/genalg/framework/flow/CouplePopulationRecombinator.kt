@@ -14,10 +14,10 @@ abstract class CouplePopulationRecombinator<E : Entity, F : EvaluatedEntity<E>, 
             .withIndex()
             .partition { it.index % 2 == 0 }
             .run { first.zip(second) }
-            .map { recombineCouple(it.first.value, it.second.value) }
+            .flatMap { recombineCouple(it.first.value, it.second.value) }
 
         return Population(newEntities)
     }
 
-    protected abstract fun recombineCouple(entity1: E, entity2: E): E
+    protected abstract fun recombineCouple(entity1: E, entity2: E): Collection<E>
 }
