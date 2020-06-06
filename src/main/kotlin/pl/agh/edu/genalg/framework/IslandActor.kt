@@ -91,7 +91,7 @@ class IslandActor<E : Entity, F : EvaluatedEntity<E>, H : Hyperparameters>(
 
                 iterationReporter.report(iterationCount, evaluatedPopulation)
 
-                delay((0..10).random().nanoseconds)
+                delay((0..5).random().nanoseconds)
             }
             reporter.log("finished; populationSize = ${evaluatedPopulation.size}")
             if (shouldAllStop) {
